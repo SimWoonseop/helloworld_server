@@ -10,6 +10,7 @@ int main()
 	SOCKET hServSock, hClntSock;
 	SOCKADDR_IN servAddr, clntAddr;
 
+
 	short port = 5001;
 	int szClntAddr;
 	char message[] = "HelloWorld!";
