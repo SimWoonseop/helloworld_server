@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <WinSock2.h>
 
+#define BUF_SIZE 1024
 void ErrorHendling(const char* message);
 
 int main()
@@ -13,7 +15,8 @@ int main()
 
 	short port = 5001;
 	int szClntAddr;
-	char message[] = "HelloWorld!";
+	int strLen;
+	char message[BUF_SIZE];
 
 
 	if (WSAStartup(MAKEWORD(2, 2), &wasData) != 0)
@@ -45,16 +48,29 @@ int main()
 	}
 
 	szClntAddr = sizeof(clntAddr);
-	hClntSock = accept(hServSock, (SOCKADDR*)&clntAddr, &szClntAddr);
-
-	if (hClntSock == INVALID_SOCKET)
+	
+	for (int i = 0; i < 5; i++)
 	{
-		ErrorHendling("accept() error!");
+		hClntSock = accept(hServSock, (SOCKADDR*)&clntAddr, &szClntAddr);
+
+		if (hClntSock == INVALID_SOCKET)
+		{
+			ErrorHendling("accept() error!");
+		}
+		else
+		{
+			printf("Connected Client %d \n", i + 1);
+		}
+
+		while ((strLen = recv(hClntSock, message, BUF_SIZE, 0)) != 0)
+		{
+			send(hClntSock, message, strLen, 0);
+		}
+
+		closesocket(hClntSock);
 	}
 
-	send(hClntSock, message, sizeof(message), 0);
-
-	closesocket(hClntSock);
+	
 	closesocket(hServSock);
 	WSACleanup();
 	return 0;
